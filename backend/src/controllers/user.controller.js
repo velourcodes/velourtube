@@ -4,6 +4,11 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/users.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { JWTVerify } from "../middlewares/auth.middleware.js";
+import jwt from "jsonwebtoken";
+const options = {
+    httpOnly: true,
+    secure: true,
+};
 
 const registerUser = asyncHandler(async (req, res) => {
     // get user details from frontend
@@ -126,19 +131,18 @@ const loginUser = asyncHandler(async (req, res) => {
             "-password -refreshToken"
         );
 
-        const options = {
-            httpOnly: true,
-            secure: true,
-        };
-
         return res
             .status(200)
-            .cookie("AccessToken", accessToken, options)
-            .cookie("RefreshToken", refreshToken, options)
+            .cookie("accessToken", accessToken, options)
+            .cookie("refreshToken", refreshToken, options)
             .json(
                 new ApiResponse(
                     200,
-                    loggedInUser,
+                    {
+                        user: loggedInUser,
+                        accessToken,
+                        refreshToken,
+                    },
                     "User logged in successfully"
                 )
             );
@@ -157,14 +161,50 @@ const logoutUser = asyncHandler(async (req, res) => {
             new: true,
         }
     );
-    const options = {
-        httpOnly: true,
-        secure: true,
-    };
+
     return res
         .status(200)
-        .clearCookie("AccessToken", options)
-        .clearCookie("RefreshToken", options)
+        .clearCookie("accessToken", options)
+        .clearCookie("refreshToken", options)
         .json(new ApiResponse(204, {}, "User was logged out successfully! "));
 });
-export { registerUser, loginUser, logoutUser };
+
+const refreshAccessToken = asyncHandler(async (req, res) => {
+    const incomingRefreshToken =
+        req.cookies.refreshToken || req.body.refreshToken;
+    // For mobile users req.body is non existent
+
+    if (!incomingRefreshToken) throw new ApiError(401, "Unauthorized Request"); // If token is not in correct format/ empty
+
+    const decodedToken = jwt.verify(
+        incomingRefreshToken,
+        process.env.REFRESH_TOKEN_SECRET
+    );
+
+    const user = await User.findById(decodedToken._id);
+
+    if (!user) throw new ApiError(401, "Invalid Refresh Token!"); // User not valid or no user found
+
+    console.log("Decoded Refresh Token: ", decodedToken);
+    if (!(incomingRefreshToken === user.refreshToken))
+        throw new ApiError(401, "Unauthrozied Request");
+    // Expired Token - Even if user is valid, refresh and login not allowed anymore
+
+    const accessToken = user.generateAccessToken();
+    const refreshToken = user.generateAccessToken();
+
+    user.refreshToken = refreshToken;
+    user.save({ validateBeforeSave: false });
+
+    console.log("Before Refreshing: ", incomingRefreshToken);
+    console.log("After Refreshing: ", refreshToken);
+
+    return res
+        .status(200)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .json(
+            new ApiResponse(200, null, "Access Token Refreshed Successfully")
+        );
+});
+export { registerUser, loginUser, logoutUser, refreshAccessToken };
