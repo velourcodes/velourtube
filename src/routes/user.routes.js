@@ -3,6 +3,7 @@ import {
     loginUser,
     logoutUser,
     registerUser,
+    refreshAccessToken
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { JWTVerify } from "../middlewares/auth.middleware.js";
@@ -24,6 +25,7 @@ router.route("/register").post(
 );
 router.route("/login").post(loginUser);
 router.route("/logout").post(JWTVerify, logoutUser);
+router.route("/refresh").post(refreshAccessToken);
 export default router;
 
 // Exporting the router means you're exporting this configured mini-app that knows about all the routes you've defined on it.

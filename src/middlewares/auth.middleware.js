@@ -6,7 +6,7 @@ import { User } from "../models/users.model.js";
 export const JWTVerify = asyncHandler(async (req, res, next) => {
     try {
         const token =
-            req.cookies?.AccessToken ||
+            req.cookies?.accessToken ||
             req.header("Authorization").replace("Bearer ", "");
 
         /* The part after || is there incase the user is sending tokens as header from mobile phone, 
