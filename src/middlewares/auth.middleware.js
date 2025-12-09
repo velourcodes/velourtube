@@ -4,27 +4,24 @@ import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/users.model.js";
 
 export const JWTVerify = asyncHandler(async (req, res, next) => {
-    try {
-        const token =
-            req.cookies?.accessToken ||
-            req.header("Authorization").replace("Bearer ", "");
+    const token =
+        req.cookies?.accessToken ||
+        req.header("Authorization")?.replace("Bearer ", "");
+    console.log(token);
 
-        /* The part after || is there incase the user is sending tokens as header from mobile phone, 
+    /* The part after || is there incase the user is sending tokens as header from mobile phone, 
         Token general format: Bearer <token> - hence we did the replace to get the value of token*/
 
-        if (!token) throw new ApiError(401, "Unauthorized Request!");
+    if (!token) throw new ApiError(401, "Unauthorized Request!");
 
-        const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
-        const user = await User.findById(decodedToken?._id).select(
-            "-password -refreshToken"
-        );
+    const user = await User.findById(decodedToken?._id).select(
+        "-password -refreshToken"
+    );
 
-        if (!user) throw new ApiError(401, "Invalid Access Token!");
+    if (!user) throw new ApiError(401, "Invalid Access Token!");
 
-        req.user = user;
-        next();
-    } catch (error) {
-        throw new ApiError(401, "Invalid access token!");
-    }
+    req.user = user;
+    next();
 });
