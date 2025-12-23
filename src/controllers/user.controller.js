@@ -5,7 +5,6 @@ import { User } from "../models/users.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { JWTVerify } from "../middlewares/auth.middleware.js";
 import jwt from "jsonwebtoken";
-import { channel } from "process";
 import mongoose from "mongoose";
 const options = {
     httpOnly: true,
@@ -365,7 +364,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
                 from: "subscriptions", // unlike most places where we refer to the model using exported variable name, here we are querying with the name which it internally saves as in MongoDB
                 localField: "_id",
                 foreignField: "channel",
-                as: "subscibers",
+                as: "subscribers",
             },
         },
         {
@@ -388,7 +387,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
                     $cond: {
                         if: {
                             $in: [
-                                mongoose.Types.ObjectId(req.user._id), // value to search for
+                                new mongoose.Types.ObjectId(req.user._id), // value to search for
                                 "$subscribers.subscriber", // array's field to check in
                             ],
                         },
@@ -420,6 +419,64 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
         );
 });
 
+const getWatchHistory = asyncHandler(async (req, res) => {
+    const user = await User.aggregate([
+        {
+            $match: {
+                _id: new mongoose.Types.ObjectId(req.user._id),
+            },
+        },
+        {
+            $lookup: {
+                from: "videos",
+                localField: "watchHistory", // [video1, video2, video3]
+                foreignField: "_id", // Match with video _id
+                as: "watchHistory", // Replace the array of video _ids with actual video docs
+                pipeline: [
+                    // This runs on EACH matched video (whole doc)
+                    {
+                        // Sub-pipeline 1: Get video owner details
+                        $lookup: {
+                            from: "users", // [user456] or [user789]
+                            localField: "owner", // Match with user _id
+                            foreignField: "_id", // Add owner details array
+                            as: "owner", // This runs on the owner lookup results
+                            pipeline: [
+                                {
+                                    // To reduce the data of owner and pass it on
+                                    $project: {
+                                        fullName: 1,
+                                        username: 1,
+                                        avatar: 1,
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        // Sub-pipeline 2: Flatten owner array
+                        $addFields: {
+                            owner: {
+                                $first: "$owner", // Takes the FIRST element from the owner array, our video model is designed to support multiple owner per video, but for more common cases, we have one owner per video hence this logic here -> TRANSFORMS THE ARRAY OF OBJECT(S) TO JUST AN OBJECT!
+                            },
+                        },
+                    },
+                ],
+            },
+        },
+    ]);
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                user[0].watchHistory,
+                "Watch History fetched successfully"
+            )
+        );
+});
+
 export {
     registerUser,
     loginUser,
@@ -431,7 +488,8 @@ export {
     updateAvatar,
     updateCoverImage,
     deleteUser,
-    getUserChannelProfile
+    getUserChannelProfile,
+    getWatchHistory,
 };
 
 // Input: All User documents
