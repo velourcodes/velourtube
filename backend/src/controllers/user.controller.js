@@ -59,26 +59,33 @@ const registerUser = asyncHandler(async (req, res) => {
 
     if (!avatarLocalPath) throw new ApiError(400, "Avatar is required!");
 
-    const avatar = await uploadOnCloudinary(avatarLocalPath);
-    const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+    const avatarResponse = await uploadOnCloudinary(avatarLocalPath);
+    const coverImageResponse = await uploadOnCloudinary(coverImageLocalPath);
 
-    console.log(avatar);
-    console.log(coverImage);
+    console.log(avatarResponse);
+    console.log(coverImageResponse);
 
-    if (!avatar) throw new ApiError(400, "Avatar file is required!");
+    if (!avatarResponse.secure_url && !avatarResponse.public_id)
+        throw new ApiError(400, "Avatar file is required!");
 
     const user = await User.create({
         username: username.toLowerCase(),
         email,
         fullName,
         password,
-        avatar: avatar,
-        coverImage: coverImage || "",
+        avatar: {
+            secure_url: avatarResponse.secure_url,
+            public_id: avatarResponse.public_id,
+        },
+        coverImage: {
+            secure_url: coverImageResponse.secure_url,
+            public_id: coverImageResponse.public_id,
+        },
     });
 
     const createdUser = await User.findById(user._id).select(
-        "-password -refreshToken"
-    );
+        "-password -refreshToken -public_id"
+    ); // public_id should remain secure from frontend - remove it!
 
     if (!createdUser)
         throw new ApiError(
@@ -132,7 +139,7 @@ const loginUser = asyncHandler(async (req, res) => {
         user.save({ validateBeforeSave: false });
 
         const loggedInUser = await User.findById(user._id).select(
-            "-password -refreshToken"
+            "-password -refreshToken -avatar.public_id -coverImage.public_id"
         );
 
         return res
@@ -281,21 +288,21 @@ const updateAvatar = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
     if (!user) throw new ApiError(404, "User not found");
 
-    const avatarObject = await uploadOnCloudinary(newAvatarLocalPath);
-    if (!avatarObject?.secure_url && !avatarObject?.public_id)
+    const avatarResponse = await uploadOnCloudinary(newAvatarLocalPath);
+    if (!avatarResponse?.secure_url && !avatarResponse?.public_id)
         throw new ApiError(502, "Avatar upload failed");
     const updatedUser = await User.findByIdAndUpdate(
         req.user._id,
         {
             $set: {
                 avatar: {
-                    secure_url: avatarObject?.secure_url,
-                    public_id: avatarObject.public_id,
+                    secure_url: avatarResponse?.secure_url,
+                    public_id: avatarResponse.public_id,
                 },
             },
         },
         { new: true }
-    ).select("-password -refreshToken");
+    ).select("-password -refreshToken -avatar.public_id -coverImage.public_id");
     // Update user and return response right away
 
     // Fire-and-forget (non-blocking):
@@ -329,21 +336,21 @@ const updateCoverImage = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
     if (!user) throw new ApiError(404, "User not found");
 
-    const coverImageObject = await uploadOnCloudinary(newCoverImageLocalPath);
-    if (!coverImageObject?.secure_url && !coverImageObject?.public_id)
+    const coverImageResponse = await uploadOnCloudinary(newCoverImageLocalPath);
+    if (!coverImageResponse?.secure_url && !coverImageResponse?.public_id)
         throw new ApiError(502, "Cover image upload failed");
     const updatedUser = await User.findByIdAndUpdate(
         req.user._id,
         {
             $set: {
                 coverImage: {
-                    secure_url: coverImageObject?.secure_url,
-                    public_id: coverImageObject?.public_id,
+                    secure_url: coverImageResponse?.secure_url,
+                    public_id: coverImageResponse?.public_id,
                 },
             },
         },
         { new: true }
-    ).select("-password -refreshToken");
+    ).select("-password -refreshToken -avatar.public_id -coverImage.public_id");
     // Update user and return response right away
 
     // Fire-and-forget (non-blocking):

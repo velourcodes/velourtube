@@ -9,17 +9,29 @@ const videoSchema = new mongoose.Schema(
             index: true,
         },
         thumbnail: {
-            type: String,
-            required: true,
+            secure_url: {
+                type: String,
+                required: true,
+            },
+            public_id: {
+                type: String,
+                required: true,
+            },
         },
         videoFile: {
-            type: String,
-            required: true,
+            secure_url: {
+                type: String,
+                required: true,
+            },
+            public_id: {
+                type: String,
+                required: true,
+            },
         },
         owner: [
             {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: "users",
+                ref: "User",
             },
         ],
         description: {
@@ -35,7 +47,7 @@ const videoSchema = new mongoose.Schema(
         },
         views: {
             type: Number,
-            required: true,
+            default: 0,
         },
         isPublished: {
             type: Boolean,
