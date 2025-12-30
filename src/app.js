@@ -21,9 +21,11 @@ app.use(cookieParser());
 // Import Router
 
 import userRoutes from "./routes/user.routes.js";
+import videoRoutes from "./routes/video.routes.js";
 
 // Define routes [through middleware]
 app.use("/api/v1/users", userRoutes);
 // eg of routes via middleware: http://localhost:5000/api/v1/users/register
+app.use("/api/v1/video", videoRoutes);
 
 export { app };
