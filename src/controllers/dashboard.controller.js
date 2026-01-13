@@ -503,6 +503,8 @@ const getChannelStats = asyncHandler(async (req, res) => {
 
     const playlistsHavingChannelVideos = await Playlist.countDocuments({
         videos: { $in: channelVideoIds },
+        owner: { $ne: req.user?._id },
+        // Show only those playlists that contain videos of channel owner but they were not created by channel owner themselves!!!
     });
 
     const totalPlaylistsOnChannel = await Playlist.countDocuments({
