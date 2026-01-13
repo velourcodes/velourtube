@@ -142,7 +142,29 @@ const deleteTweet = asyncHandler(async (req, res) => {
 });
 
 const deleteAllTweetsByUser = asyncHandler(async (req, res) => {
-    // TODO: delete all the tweets of one single user, by taking their userId and match owner field, delete all those if present
+    const { password, confirmPassword } = req.body;
+
+    if (!password?.trim() || !confirmPassword?.trim())
+        throw new ApiError(400, "Password fields cannot be left blank!");
+
+    if (password?.trim() !== confirmPassword?.trim())
+        throw new ApiError(400, "Passwords do not match!");
+
+    const userId = req.user?._id;
+
+    const deletionResult = await Tweet.deleteMany({owner: userId});
+
+    if(!deletionResult.deletedCount) throw new ApiError(404, "No tweets found by user!");
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, null, "All tweets deleted successfully"));
 });
 
-export { createTweet, getUserTweets, updateTweet, deleteTweet };
+export {
+    createTweet,
+    getUserTweets,
+    updateTweet,
+    deleteTweet,
+    deleteAllTweetsByUser,
+};
