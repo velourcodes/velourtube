@@ -1,7 +1,7 @@
-# VideoTube v1.0.0
+# Velour Verse v1.0.0
 
 # What is this API?
-  VideoTube **(developed by Mohammad Affan Siddiqi aka @velourcodes)** is a hybrid API implementing basic YouTube and Twitter functionalities. Well its not just basic CRUD but includes what are production grade backend 
+  Velour Verse **(developed by Mohammad Affan Siddiqi aka @velourcodes)** is a hybrid API implementing basic YouTube (as Velour Vortex) and Twitter (Velour Vox) functionalities. Well its not just basic CRUD but includes what are production grade backend 
   practices including:
   - Aggregation pipelines (to transform and bend the data as per my backend developer's choice),
   - Abstracting secure data like tokens, passwords and public_id(s) from frontend,
