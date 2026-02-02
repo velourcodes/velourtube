@@ -183,34 +183,126 @@ const publishAVideo = asyncHandler(async (req, res) => {
 
 const getVideoById = asyncHandler(async (req, res) => {
     const { videoId } = req.params;
-    const userId = new mongoose.Types.ObjectId(req.user?._id);
-
+    const userId = req.user?._id
+        ? new mongoose.Types.ObjectId(req.user?._id)
+        : null;
+    // find a video in db with entered videoId
+    // return videoFile url and thumbnail url, along with video owner name and avatar
+    // if pipeline.length = 0/false throw error
+    // if isPublished is true, then increase the views count by 1 ($inc)
+    // also add this video id to the watchHistory array of User
+    // if isPublished is false, and owner ne loggedin User, raise authorization error
     if (!mongoose.Types.ObjectId.isValid(videoId))
         throw new ApiError(400, "Invalid video id provided by user!");
 
-    const video = await Video.findById(videoId)
-        .select("-videoFile.public_id -thumbnail.public_id")
-        .populate("owner", "username avatar.secure_url");
-
-    if (!video)
+    const video = await Video.aggregate([
+        {
+            $match: {
+                _id: new mongoose.Types.ObjectId(videoId),
+                $expr: {
+                    $or: [
+                        { $eq: ["$isPublished", true] },
+                        {
+                            $in: [userId, "$owner"],
+                        },
+                    ],
+                },
+            },
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "ownerData",
+                pipeline: [
+                    {
+                        $project: {
+                            ownerUsername: "$username",
+                            ownerAvatarURL: "$avatar.secure_url",
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $addFields: {
+                ownerDetails: { $first: "$ownerData" },
+                ownerId: { $first: "$owner" },
+            },
+        },
+        {
+            $lookup: {
+                from: "subscriptions",
+                localField: "ownerId",
+                foreignField: "channel",
+                as: "subscribers",
+            },
+        },
+        {
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "video",
+                as: "videoLikeData",
+            },
+        },
+        {
+            $addFields: {
+                videoLikeCount: { $size: "$videoLikeData" },
+                subscribersCount: { $size: "$subscribers" },
+                isLikedByUser: {
+                    $cond: [
+                        { $ne: [userId, null] },
+                        { $in: [userId, "$videoLikeData.likedBy"] },
+                        false,
+                    ],
+                },
+                isSubscribed: {
+                    $cond: [
+                        { $ne: [userId, null] },
+                        { $in: [userId, "$subscribers.subscriber"] },
+                        false,
+                    ],
+                },
+            },
+        },
+        {
+            $project: {
+                title: 1,
+                videoFile: "$videoFile.secure_url",
+                thumbnailURL: "$thumbnail.secure_url",
+                description: 1,
+                createdAt: 1,
+                ownerAvatarURL: "$ownerDetails.ownerAvatarURL",
+                ownerUsername: "$ownerDetails.ownerUsername",
+                ownerId: 1,
+                views: 1,
+                isPublished: 1,
+                videoLikeCount: 1,
+                isLikedByUser: 1,
+                subscribersCount: 1,
+                isSubscribed: 1,
+            },
+        },
+    ]);
+    if (!video.length)
         throw new ApiError(
             404,
             "No video found with the provided ID in database!"
         );
-
-    const isOwner = video.owner[0].equals(userId);
-    if (video.isPublished) {
-        video.views = ++video.views;
-        await video.save({ validateBeforeSave: false });
-        await User.findByIdAndUpdate(userId, {
-            $addToSet: {
-                watchHistory: video._id,
-            },
-        });
-    } else {
-        if (!isOwner) {
-            throw new ApiError(403, "Access to requested video is forbidden!");
+    const videoDocument = await Video.findById(videoId);
+    if (videoDocument.isPublished) {
+        videoDocument.views = ++videoDocument.views;
+        await videoDocument.save({ validateBeforeSave: false });
+        if (userId) {
+            await User.findByIdAndUpdate(userId, {
+                $addToSet: { watchHistory: videoDocument._id },
+            });
         }
+    } else {
+        if (!videoDocument.owner[0].equals(userId))
+            throw new ApiError(403, "Access to requested video is forbidden!");
     }
 
     return res
@@ -218,7 +310,7 @@ const getVideoById = asyncHandler(async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-                video,
+                video[0],
                 "Video fetched from videoId successfully"
             )
         );
