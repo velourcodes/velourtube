@@ -63,7 +63,7 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
 
 const toggleCommentLike = asyncHandler(async (req, res) => {
     const { commentId } = req.params;
-    
+
     const userId = req.user?._id;
     if (!commentId?.trim())
         throw new ApiError(400, "commentId cannot be left blank!");
@@ -168,10 +168,81 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
 const getLikedVideos = asyncHandler(async (req, res) => {
     //TODO: get all liked videos
     const userId = req.user?._id;
-    const likedVideos = await Like.find({
-        likedBy: userId,
-        video: { $exists: true, $ne: null },
-    }).populate("video", "title description");
+    // const likedVideos = await Like.find({
+    //     likedBy: userId,
+    //     video: { $exists: true, $ne: null },
+    // })
+    //     .populate("video", "title description owner")
+    //     .populate("owner", "avatar.secure_url username");
+
+    const likedVideos = await Like.aggregate([
+        {
+            $match: { likedBy: userId, video: { $exists: true, $ne: null } },
+        },
+        {
+            $lookup: {
+                from: "videos",
+                localField: "video",
+                foreignField: "_id",
+                as: "videoData",
+                pipeline: [
+                    {
+                        $project: {
+                            owner: 1,
+                            title: 1,
+                            description: 1,
+                            views: 1,
+                            isPublished: 1,
+                            createdAt: 1,
+                            duration: 1,
+                            thumbnail: "$thumbnail.secure_url",
+                            videoFile: "$videoFile.secure_url",
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $addFields: {
+                video: { $first: "$videoData" },
+            },
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "video.owner",
+                foreignField: "_id",
+                as: "ownerData",
+                pipeline: [
+                    {
+                        $project: {
+                            ownerUsername: "$username",
+                            ownerAvatarURL: "$avatar.secure_url",
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $addFields: {
+                owner: { $first: "$ownerData" },
+            },
+        },
+        {
+            $project: {
+                title: "$video.title",
+                description: "$video.description",
+                thumbnail: "$video.thumbnail",
+                videoFile: "$video.videoFile",
+                duration: "$video.duration",
+                views: "$video.views",
+                createdAt: "$video.createdAt",
+                videoOwnerUsername: "$owner.ownerUsername",
+                videoOwnerAvatarURL: "$owner.ownerAvatarURL",
+            },
+        },
+    ]);
+
     if (!likedVideos.length)
         throw new ApiError(404, "No videos liked by user!");
 
