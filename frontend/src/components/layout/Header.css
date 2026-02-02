@@ -1,0 +1,286 @@
+.app-header {
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-decoration: none;
+    line-height: normal;
+}
+
+.header-logo {
+    height: 40px;
+    width: auto;
+    display: block;
+    filter: drop-shadow(0 0 10px rgba(255, 77, 109, 0.5));
+}
+
+.logo {
+    font-weight: 850;
+    font-size: 1.8rem;
+    letter-spacing: -0.8px;
+    text-transform: none;
+    margin: 0;
+    line-height: 1.2;
+    display: flex;
+    align-items: center;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+}
+
+.user-profile-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    position: relative;
+}
+
+.profile-dropdown-container {
+    position: relative;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.4rem 1rem;
+    background: var(--color-bg-dark);
+    border-radius: 20px;
+    border: 1px solid var(--color-border);
+    transition: all 0.2s;
+    cursor: pointer;
+    user-select: none;
+}
+
+.user-info:hover,
+.user-info.active {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 15px rgba(255, 77, 109, 0.1);
+    background: var(--color-surface);
+}
+
+.username {
+    font-weight: 600;
+    color: var(--color-text-main);
+    font-size: 1rem;
+}
+
+.dropdown-arrow {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    transition: transform 0.3s;
+}
+
+.dropdown-arrow.open {
+    transform: rotate(180deg);
+}
+
+.user-avatar-small {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid var(--color-primary);
+    background: var(--color-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-avatar-small img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-placeholder-small {
+    font-size: 1.2rem;
+}
+
+/* Premium Dropdown Styling */
+.premium-dropdown {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    width: 260px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    padding: 0.8rem;
+    animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 1001;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.dropdown-header {
+    padding: 0.8rem 1rem;
+}
+
+.user-full-name {
+    margin: 0;
+    font-weight: 700;
+    color: var(--color-text-main);
+    font-size: 1.1rem;
+}
+
+.user-email-text {
+    margin: 4px 0 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    font-weight: 400;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background: var(--color-border);
+    margin: 0.8rem 0;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.8rem 1rem;
+    color: var(--color-text-main);
+    text-decoration: none;
+    font-weight: 500;
+    border-radius: 10px;
+    transition: all 0.2s;
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
+.dropdown-item:hover {
+    background: var(--color-bg-dark);
+    color: var(--color-primary);
+    transform: translateX(5px);
+}
+
+.item-icon {
+    font-size: 1.1rem;
+}
+
+.logout-item:hover {
+    color: var(--color-primary);
+    background: rgba(255, 77, 109, 0.05);
+}
+
+/* Theme Switcher Styling */
+.theme-switcher-section {
+    padding: 0.5rem 1rem;
+}
+
+.section-title {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin: 0 0 0.8rem 0;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.theme-options {
+    display: flex;
+    background: var(--color-bg-dark);
+    padding: 4px;
+    border-radius: 10px;
+    gap: 4px;
+}
+
+.theme-opt {
+    flex: 1;
+    padding: 0.5rem;
+    border-radius: 8px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-opt:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.theme-opt.active {
+    background: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+    color: var(--color-primary);
+}
+
+.btn-upload-header {
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.4rem;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(255, 77, 109, 0.3);
+}
+
+.btn-upload-header:hover {
+    background: var(--color-primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 77, 109, 0.4);
+}
+
+.login-link {
+    color: var(--color-text-main);
+    text-decoration: none;
+    font-weight: 700;
+    padding: 0.7rem 1.8rem;
+    background: var(--color-surface);
+    border-radius: 12px;
+    border: 1px solid var(--color-border);
+    transition: all 0.2s;
+}
+
+.login-link:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    box-shadow: 0 0 20px rgba(255, 77, 109, 0.1);
+}

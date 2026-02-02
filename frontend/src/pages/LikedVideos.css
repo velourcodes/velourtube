@@ -1,0 +1,114 @@
+.liked-videos-container {
+    padding: 3rem 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+}
+
+.liked-page-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    text-align: center;
+    padding: 2rem;
+    background: linear-gradient(180deg, var(--color-surface) 0%, transparent 100%);
+    border-radius: 24px;
+    border: 1px solid var(--color-border);
+}
+
+.liked-page-header h1 {
+    font-size: 3.5rem;
+    font-weight: 900;
+    margin: 0;
+    letter-spacing: -2px;
+}
+
+.liked-meta-animated {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    animation: fadeInSlide 0.8s ease-out;
+}
+
+.count-badge {
+    background: var(--color-primary);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 1rem;
+    font-weight: 800;
+    box-shadow: 0 4px 12px var(--color-primary-soft);
+}
+
+.count-text {
+    font-size: 1.1rem;
+    color: var(--color-text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+@keyframes fadeInSlide {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.liked-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.liked-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 5rem 0;
+    color: var(--color-text-muted);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    color: var(--color-text-main);
+    font-size: 1.5rem;
+}
+
+.empty-state p {
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+    .liked-videos-container {
+        flex-direction: column;
+    }
+
+    .liked-header {
+        flex: none;
+        width: 100%;
+    }
+
+    .liked-info-box {
+        position: static;
+    }
+}

@@ -1,0 +1,131 @@
+/* Layout.css */
+.app-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: var(--color-bg-dark);
+}
+
+.app-header {
+    height: 64px;
+    background-color: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    padding: 0 1.5rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    box-shadow: var(--shadow-sm);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+}
+
+.logo {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--color-primary);
+    letter-spacing: -0.5px;
+    text-transform: uppercase;
+}
+
+.user-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-actions span {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+}
+
+.btn-logout {
+    background-color: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-main);
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+
+.btn-logout:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.app-body {
+    display: flex;
+    flex: 1;
+    padding-top: 64px;
+    /* Header height */
+}
+
+.app-sidebar {
+    width: 240px;
+    background-color: var(--color-surface);
+    border-right: 1px solid var(--color-border);
+    height: calc(100vh - 64px);
+    position: fixed;
+    top: 64px;
+    left: 0;
+    overflow-y: auto;
+    padding: 1.5rem 0;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    font-size: 0.95rem;
+    border-left: 3px solid transparent;
+    transition: all 0.2s;
+}
+
+.nav-link:hover {
+    background-color: var(--color-surface-hover);
+    color: var(--color-text-main);
+}
+
+.nav-link.active {
+    background-color: rgba(255, 68, 91, 0.1);
+    color: var(--color-primary);
+    border-left-color: var(--color-primary);
+}
+
+.divider {
+    height: 1px;
+    background-color: var(--color-border);
+    margin: 1rem 0;
+}
+
+.app-main {
+    flex: 1;
+    margin-left: 240px;
+    padding: 2rem;
+    overflow-y: auto;
+    background-color: var(--color-bg-dark);
+}
+
+.app-main.full-width {
+    margin-left: 0;
+}
+
+@media (max-width: 768px) {
+    .app-sidebar {
+        display: none;
+    }
+
+    .app-main {
+        margin-left: 0;
+    }
+}
