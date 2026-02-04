@@ -25,12 +25,16 @@ const createTweet = asyncHandler(async (req, res) => {
 });
 
 const viewTweets = asyncHandler(async (req, res) => {
+    const userId = req.user?._id;
+
     const { page = 1, limit = 10 } = req.query;
     let pageValue = parseInt(page);
     let limitValue = parseInt(limit);
 
     if (limitValue <= 0 || limitValue >= 1000) limitValue = 10;
-    const totalPages = Math.ceil(totalUserTweetCount / limitValue);
+
+    const totalTweetCount = await Tweet.countDocuments();
+    const totalPages = Math.ceil(totalTweetCount / limitValue);
     if (pageValue <= 0 || pageValue > totalPages) pageValue = 1;
 
     const populatedTweets = await Tweet.aggregate([
@@ -49,10 +53,32 @@ const viewTweets = asyncHandler(async (req, res) => {
             $unwind: "$ownerData",
         },
         {
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "tweet",
+                as: "tweetLikeData",
+            },
+        },
+        {
+            $addFields: {
+                tweetLikeCount: { $size: "$tweetLikeData" },
+                isLikedByUser: {
+                    $cond: [
+                        { $ne: [userId, null] },
+                        { $in: [userId, "$tweetLikeData.likedBy"] },
+                        false,
+                    ],
+                },
+            },
+        },
+        {
             $project: {
                 content: 1,
                 ownerUsername: "$ownerData.username",
                 ownerAvatarURL: "$ownerData.avatar.secure_url",
+                isLikedByUser: 1,
+                tweetLikeCount: 1,
                 createdAt: 1,
             },
         },
@@ -116,10 +142,32 @@ const getUserTweets = asyncHandler(async (req, res) => {
             $unwind: "$ownerData",
         },
         {
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "tweet",
+                as: "tweetLikeData",
+            },
+        },
+        {
+            $addFields: {
+                tweetLikeCount: { $size: "$tweetLikeData" },
+                isLikedByUser: {
+                    $cond: [
+                        { $ne: [userId, null] },
+                        { $in: [userId, "$tweetLikeData.likedBy"] },
+                        false,
+                    ],
+                },
+            },
+        },
+        {
             $project: {
                 content: 1,
                 ownerUsername: "$ownerData.username",
                 ownerAvatarURL: "$ownerData.avatar.secure_url",
+                isLikedByUser: 1,
+                tweetLikeCount: 1,
                 createdAt: 1,
             },
         },
