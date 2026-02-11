@@ -29,45 +29,45 @@ import EditTweet from './pages/EditTweet';
 import DeleteAllTweets from './pages/DeleteAllTweets';
 
 function App() {
-  return (
-    <Router>
-      <ThemeProvider>
-        <FeedbackProvider>
-          <AuthProvider>
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
+    return (
+        <Router>
+            <ThemeProvider>
+                <FeedbackProvider>
+                    <AuthProvider>
+                        <Routes>
+                            <Route path="/login" element={<Login />} />
+                            <Route path="/register" element={<Register />} />
 
-              <Route element={<ProtectedLayout />}>
-                <Route path="/customize-profile" element={<CustomizeProfile />} />
-                <Route element={<Layout />}>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/videos" element={<HomeFeed />} />
-                  <Route path="/tweets" element={<TweetFeed />} />
-                  <Route path="/history" element={<WatchHistory />} />
-                  <Route path="/video/:videoId" element={<VideoView />} />
-                  <Route path="/settings" element={<Settings />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/liked-videos" element={<LikedVideos />} />
-                  <Route path="/my-videos" element={<MyVideos />} />
-                  <Route path="/manage-video/:videoId" element={<VideoManagement />} />
-                  <Route path="/subscriptions" element={<Subscriptions />} />
-                  <Route path="/channel/:username" element={<ChannelProfile />} />
-                  <Route path="/upload" element={<UploadVideo />} />
-                  <Route path="/my-playlists" element={<MyPlaylists />} />
-                  <Route path="/playlist/:playlistId" element={<PlaylistManagement />} />
-                  <Route path="/my-tweets-vox" element={<MyTweets />} />
-                  <Route path="/create-tweet" element={<CreateTweet />} />
-                  <Route path="/edit-tweet/:tweetId" element={<EditTweet />} />
-                  <Route path="/delete-all-tweets" element={<DeleteAllTweets />} />
-                </Route>
-              </Route>
-            </Routes>
-          </AuthProvider>
-        </FeedbackProvider>
-      </ThemeProvider>
-    </Router>
-  );
+                            <Route element={<ProtectedLayout />}>
+                                <Route path="/customize-profile" element={<CustomizeProfile />} />
+                                <Route element={<Layout />}>
+                                    <Route path="/" element={<Home />} />
+                                    <Route path="/videos" element={<HomeFeed />} />
+                                    <Route path="/tweets" element={<TweetFeed />} />
+                                    <Route path="/history" element={<WatchHistory />} />
+                                    <Route path="/video/:videoId" element={<VideoView />} />
+                                    <Route path="/settings" element={<Settings />} />
+                                    <Route path="/dashboard" element={<Dashboard />} />
+                                    <Route path="/liked-videos" element={<LikedVideos />} />
+                                    <Route path="/my-videos" element={<MyVideos />} />
+                                    <Route path="/manage-video/:videoId" element={<VideoManagement />} />
+                                    <Route path="/subscriptions" element={<Subscriptions />} />
+                                    <Route path="/channel/:username" element={<ChannelProfile />} />
+                                    <Route path="/upload" element={<UploadVideo />} />
+                                    <Route path="/my-playlists" element={<MyPlaylists />} />
+                                    <Route path="/playlist/:playlistId" element={<PlaylistManagement />} />
+                                    <Route path="/my-tweets-vox" element={<MyTweets />} />
+                                    <Route path="/create-tweet" element={<CreateTweet />} />
+                                    <Route path="/edit-tweet/:tweetId" element={<EditTweet />} />
+                                    <Route path="/delete-all-tweets" element={<DeleteAllTweets />} />
+                                </Route>
+                            </Route>
+                        </Routes>
+                    </AuthProvider>
+                </FeedbackProvider>
+            </ThemeProvider>
+        </Router>
+    );
 }
 
 export default App;
