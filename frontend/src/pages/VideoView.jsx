@@ -8,6 +8,7 @@ import { toggleVideoLike, toggleCommentLike } from '../api/like.api';
 import { toggleSubscription } from '../api/subscription.api';
 import { getVideoComments, addComment, updateComment, deleteComment } from '../api/comment.api';
 import { getRelativeTime, getDateFromId } from '../utils/timeUtils';
+import VideoCard from '../components/common/VideoCard';
 import Loader from '../components/common/Loader';
 import './VideoView.css';
 
@@ -243,9 +244,6 @@ const VideoView = () => {
         return views.toString();
     };
 
-    const handleVideoClick = (id) => {
-        navigate(`/video/${id}`);
-    };
 
     if (loading) {
         return <Loader />;
@@ -474,39 +472,7 @@ const VideoView = () => {
                 <h3 className="recommended-title">Recommended</h3>
                 <div className="recommended-list">
                     {recommendedVideos.map((recVideo) => (
-                        <div
-                            key={recVideo._id}
-                            className="recommended-card"
-                            onClick={() => handleVideoClick(recVideo._id)}
-                        >
-                            <div className="recommended-thumbnail-wrapper">
-                                <img
-                                    src={recVideo.thumbnail?.secure_url || recVideo.thumbnailURL}
-                                    alt={recVideo.title}
-                                    className="recommended-thumbnail"
-                                />
-                                <div className="video-duration">
-                                    {formatDuration(recVideo.duration)}
-                                </div>
-                            </div>
-                            <div className="recommended-info">
-                                <h4 className="recommended-video-title">{recVideo.title}</h4>
-                                <p
-                                    className="recommended-channel"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        const username = recVideo.username || recVideo.ownerUsername || recVideo.owner?.[0]?.username || recVideo.owner?.username;
-                                        navigate(`/channel/${username}`);
-                                    }}
-                                    style={{ cursor: 'pointer' }}
-                                >
-                                    {recVideo.username || recVideo.ownerUsername || recVideo.owner?.[0]?.username || recVideo.owner?.username}
-                                </p>
-                                <p className="recommended-meta">
-                                    {formatViews(recVideo.views)} views
-                                </p>
-                            </div>
-                        </div>
+                        <VideoCard key={recVideo._id} video={recVideo} type="list" />
                     ))}
                 </div>
             </div>
