@@ -127,7 +127,7 @@ const loginUser = asyncHandler(async (req, res) => {
     if (!user) throw new ApiError(404, "User not found!");
 
     if (!password || password.trim() === "")
-        throw (400, "Password is required");
+        throw new ApiError(400, "Password is required");
 
     const isPasswordValid = await user.isPasswordCorrect(password);
 
@@ -146,8 +146,8 @@ const loginUser = asyncHandler(async (req, res) => {
 
         return res
             .status(200)
-            .cookie("accessToken", accessToken, options)
-            .cookie("refreshToken", refreshToken, options)
+            .cookie("accessToken", accessToken, cookieOptions)
+            .cookie("refreshToken", refreshToken, cookieOptions)
             .json(
                 new ApiResponse(
                     200,
@@ -177,8 +177,8 @@ const logoutUser = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .clearCookie("accessToken", options)
-        .clearCookie("refreshToken", options)
+        .clearCookie("accessToken", cookieOptions)
+        .clearCookie("refreshToken", cookieOptions)
         .json(new ApiResponse(204, {}, "User was logged out successfully! "));
 });
 
