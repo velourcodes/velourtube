@@ -5,10 +5,8 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 const app = express();
 
-import {corsOptions} from "./cors.js"
-app.use(
-    cors(corsOptions)
-); // allows cookies/ auth tokens to be sent
+import { corsOptions } from "./config/cors.js";
+app.use(cors(corsOptions)); // allows cookies/ auth tokens to be sent
 
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
@@ -27,12 +25,12 @@ import likeRoutes from "./routes/like.routes.js";
 import dashboardRoutes from "./routes/dashboard.routes.js";
 import healthcheckRoutes from "./routes/healthcheck.routes.js";
 // Define routes [through middleware]
-app.get('/api/v1/productionHealthCheck', (req, res) => {
-  console.log('Simple production health check called');
-  res.status(200).json({ 
-    status: 'ok',
-    timestamp: new Date().toISOString() 
-  });
+app.get("/api/v1/productionHealthCheck", (req, res) => {
+    console.log("Simple production health check called");
+    res.status(200).json({
+        status: "ok",
+        timestamp: new Date().toISOString(),
+    });
 });
 app.use("/api/v1/healthcheck", healthcheckRoutes);
 app.use("/api/v1/users", userRoutes);
