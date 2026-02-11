@@ -8,10 +8,7 @@ import {
 } from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
-const options = {
-    httpOnly: true,
-    secure: true,
-};
+import { cookieOptions } from "../config/cookies.js";
 
 const registerUser = asyncHandler(async (req, res) => {
     // get user details from frontend
@@ -217,8 +214,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .cookie("accessToken", accessToken, options)
-        .cookie("refreshToken", refreshToken, options)
+        .cookie("accessToken", accessToken, cookieOptions)
+        .cookie("refreshToken", refreshToken, cookieOptions)
         .json(
             new ApiResponse(
                 200,
